@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nokia 3310 (2000) — 360° Feature Demo</title>
+<link rel="icon" href="data:,">
+<style>
+/* ============================================================
+   Nokia 3310 (original, 2000) — front-face replica (MIN-33 spec)
+   + MIN-35: full 3D shell (back / sides / top / bottom) that
+   spins a continuous 360° while an auto-tour walks the phone
+   through its menus and features.
+   SCALE = 6 px/mm. Body bounding box: 48 W x 113 H x 20 D mm
+   -> 288 x 678 x 120 px.
+   ============================================================ */
+:root{
+  --lcd-bg:#b9c4ab; --lcd-fg:#1f2a1c;
+  --key-hi:#eef1f4; --key-mid:#c3c8ce; --key-lo:#9aa0a7;
+  --legend:#25282d; --legend-dim:#5b6067;
+}
+/* colour themes — the 3310 shipped in several glossy shades (default navy).
+   Defined on .phone3d so every face of the 3D shell shares the theme;
+   also kept on #phone for compatibility with applyTheme(). */
+.phone3d[data-theme="blue"],   #phone[data-theme="blue"]   { --b1:#4a6fb2; --b2:#2f5092; --b3:#16294e; }
+.phone3d[data-theme="green"],  #phone[data-theme="green"]  { --b1:#74a452; --b2:#4d7c33; --b3:#28481a; }
+.phone3d[data-theme="red"],    #phone[data-theme="red"]    { --b1:#c65a5a; --b2:#9c3434; --b3:#561a1a; }
+.phone3d[data-theme="grey"],   #phone[data-theme="grey"]   { --b1:#90949a; --b2:#63676d; --b3:#383b40; }
+.phone3d[data-theme="yellow"], #phone[data-theme="yellow"] { --b1:#e9cf54; --b2:#c8a832; --b3:#8c731f; }
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  background:radial-gradient(120% 95% at 50% 6%, #414a5b 0%, #23272f 48%, #121419 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  min-height:100vh;padding:20px 0;user-select:none;-webkit-user-select:none;overflow-x:hidden;
+}
+#stage{display:flex;flex-direction:column;align-items:center;gap:14px;perspective:1600px;}
+
+/* ============ DEMO CHROME ============ */
+.demo-title{
+  color:#dfe5ee;font-size:17px;font-weight:600;letter-spacing:.4px;
+  text-shadow:0 1px 2px rgba(0,0,0,.6);
+}
+.demo-title small{display:block;color:#8b93a1;font-size:11.5px;font-weight:400;letter-spacing:.3px;margin-top:3px;text-align:center;}
+
+/* ============ 3D SCENE ============ */
+.scene{position:relative;width:288px;height:678px;transform-style:preserve-3d;margin:6px 0;}
+.tilt{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(11deg);}
+.spin{position:absolute;inset:0;transform-style:preserve-3d;animation:spin360 16s linear infinite;}
+@keyframes spin360{from{transform:rotateY(0deg);}to{transform:rotateY(360deg);}}
+.phone3d{position:absolute;inset:0;transform-style:preserve-3d;}
+
+.face{position:absolute;top:0;left:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+
+/* front face = the existing #phone replica, pushed to +Z */
+#phone{transform:translateZ(60px);backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+
+/* back face — same silhouette, NOKIA logo, sealed battery cover (per reference) */
+.back{
+  width:288px;height:678px;transform:rotateY(180deg) translateZ(60px);
+  clip-path:polygon(
+    58.33% 0.00%, 63.77% 0.15%, 69.12% 0.60%, 74.28% 1.35%, 79.17% 2.37%,
+    83.70% 3.66%, 87.80% 5.18%, 91.39% 6.92%, 94.42% 8.85%, 96.83% 10.93%,
+    98.58% 13.12%, 99.64% 15.39%, 100.00% 17.70%, 100.00% 25.77%, 99.99% 33.85%,
+    99.75% 41.92%, 99.21% 50.00%, 98.38% 58.08%, 97.26% 66.15%, 98.33% 74.23%,
+    99.18% 82.30%, 100.00% 89.38%, 99.79% 90.77%, 99.15% 92.13%, 98.10% 93.44%,
+    96.65% 94.69%, 94.83% 95.85%, 92.68% 96.89%, 90.22% 97.81%, 87.50% 98.58%,
+    84.57% 99.19%, 81.47% 99.64%, 78.26% 99.91%, 75.00% 100.00%, 68.75% 100.00%,
+    62.50% 100.00%, 56.25% 100.00%, 50.00% 100.00%, 43.75% 100.00%, 37.50% 100.00%,
+    31.25% 100.00%, 25.00% 100.00%, 21.74% 99.91%, 18.53% 99.64%, 15.43% 99.19%,
+    12.50% 98.58%, 9.78% 97.81%, 7.32% 96.89%, 5.17% 95.85%, 3.35% 94.69%,
+    1.90% 93.44%, 0.85% 92.13%, 0.21% 90.77%, 0.00% 89.38%, 0.33% 89.38%,
+    0.91% 81.31%, 1.80% 73.23%, 2.59% 65.15%, 1.50% 57.08%, 0.71% 49.00%,
+    0.21% 40.93%, 0.00% 32.85%, 0.00% 17.70%, 0.36% 15.39%, 1.42% 13.12%,
+    3.17% 10.93%, 5.58% 8.85%, 8.61% 6.92%, 12.20% 5.18%, 16.30% 3.66%,
+    20.83% 2.37%, 25.72% 1.35%, 30.88% 0.60%, 36.23% 0.15%, 41.67% 0.00%
+  );
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,.05) 6%, rgba(255,255,255,0) 14%,
+      rgba(0,0,0,0) 86%, rgba(0,0,0,.10) 94%, rgba(0,0,0,.26) 100%),
+    linear-gradient(179deg, var(--b1) 0%, var(--b2) 46%, var(--b3) 100%);
+}
+.back .b-sheen{position:absolute;top:4%;bottom:4%;left:12%;width:14%;border-radius:40px;
+  background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,0));
+  filter:blur(3px);opacity:.6;pointer-events:none;}
+.back .b-logo{position:absolute;left:0;right:0;top:118px;text-align:center;
+  font-size:34px;font-weight:700;letter-spacing:12px;text-indent:12px;
+  color:#eef2f7;text-shadow:0 2px 2px rgba(0,0,0,.5), 0 -1px 0 rgba(255,255,255,.3);}
+.back .b-model{position:absolute;left:0;right:0;top:168px;text-align:center;
+  font-size:12px;font-weight:600;letter-spacing:4px;text-indent:4px;color:rgba(235,240,247,.65);
+  text-shadow:0 1px 1px rgba(0,0,0,.4);}
+/* battery cover — the whole rear panel is removable; subtle seam + release tab */
+.back .b-cover{position:absolute;left:26px;top:236px;width:236px;height:380px;border-radius:26px;
+  border:1px solid rgba(0,0,0,.28);
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.22), inset 0 -3px 8px rgba(0,0,0,.22), 0 1px 2px rgba(0,0,0,.25);
+  background:linear-gradient(180deg, rgba(255,255,255,.07) 0%, rgba(255,255,255,0) 30%, rgba(0,0,0,.06) 100%);}
+.back .b-tab{position:absolute;left:50%;top:608px;width:46px;height:12px;margin-left:-23px;border-radius:7px;
+  background:linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,.08));
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.4), 0 1px 2px rgba(0,0,0,.4);}
+
+/* side faces — 120px deep (20mm) walls */
+.sideL,.sideR{width:120px;height:678px;left:50%;margin-left:-60px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.03) 22%, rgba(0,0,0,0) 45%,
+      rgba(0,0,0,.12) 80%, rgba(0,0,0,.30) 100%),
+    linear-gradient(180deg, var(--b1) 0%, var(--b2) 55%, var(--b3) 100%);}
+.sideL{transform:rotateY(-90deg) translateZ(144px);}
+.sideR{transform:rotateY(90deg) translateZ(144px);
+  background:
+    linear-gradient(270deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.03) 22%, rgba(0,0,0,0) 45%,
+      rgba(0,0,0,.12) 80%, rgba(0,0,0,.30) 100%),
+    linear-gradient(180deg, var(--b1) 0%, var(--b2) 55%, var(--b3) 100%);}
+/* speaker grille slots on the left side (per reference photo) */
+.sideL .grille{position:absolute;left:26px;top:470px;width:68px;display:flex;flex-direction:column;gap:6px;}
+.sideL .grille i{display:block;height:5px;border-radius:3px;background:#0b0d11;
+  box-shadow:inset 0 1px 1px #000, 0 1px 0 rgba(255,255,255,.18);}
+
+/* top / bottom caps */
+.topF,.botF{width:288px;height:120px;top:50%;margin-top:-60px;
+  background:linear-gradient(90deg, var(--b3) 0%, var(--b2) 45%, var(--b2) 78%, var(--b3) 100%);}
+.topF{transform:rotateX(90deg) translateZ(339px);
+  background:linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,0) 40%),
+    linear-gradient(90deg, var(--b3) 0%, var(--b2) 50%, var(--b3) 100%);}
+.botF{transform:rotateX(-90deg) translateZ(339px);
+  background:linear-gradient(180deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,.05) 45%),
+    linear-gradient(90deg, var(--b3) 0%, var(--b2) 50%, var(--b3) 100%);}
+/* bottom edge: the spec trio — 2.5mm jack, charger socket, mic hole */
+.botF .ports{position:absolute;left:0;right:0;top:34px;display:flex;align-items:center;justify-content:center;gap:26px;}
+.botF .p-jack{width:16px;height:16px;border-radius:50%;background:#07080a;
+  box-shadow:inset 0 1px 2px #000, 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 2.5px #1a1d22;}
+.botF .p-charge{width:30px;height:13px;border-radius:7px;background:#07080a;
+  box-shadow:inset 0 1px 2px #000, 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 2.5px #1a1d22;}
+.botF .p-mic{width:6px;height:6px;border-radius:50%;background:#07080a;box-shadow:inset 0 1px 1px #000;}
+/* top edge: faint oval recess (earpiece side) */
+.topF .oval{position:absolute;left:50%;top:50%;width:64px;height:20px;margin:-10px 0 0 -32px;border-radius:50%;
+  background:radial-gradient(60% 70% at 50% 45%, rgba(0,0,0,.4), rgba(0,0,0,.15) 75%, transparent);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.5);}
+
+/* floor shadow (a flat circle in the 3D scene, under the phone) */
+.shadow3d{position:absolute;left:50%;top:50%;width:460px;height:460px;margin:-230px 0 0 -230px;border-radius:50%;
+  background:radial-gradient(closest-side, rgba(0,0,0,.55) 0%, rgba(0,0,0,.28) 45%, rgba(0,0,0,0) 72%);
+  transform:rotateX(-90deg) translateZ(356px);}
+
+/* caption bar */
+#caption{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 18px;border-radius:12px;
+  background:rgba(10,12,16,.55);border:1px solid rgba(255,255,255,.09);
+  box-shadow:0 4px 14px rgba(0,0,0,.35);max-width:640px;}
+#caption .step{font-size:10.5px;font-weight:700;letter-spacing:1px;color:#8fa3c8;white-space:nowrap;}
+#caption-text{color:#e3e9f2;font-size:13.5px;letter-spacing:.2px;transition:opacity .18s ease;text-align:center;}
+
+/* ---- colour picker + hints (kept from the app) ---- */
+.palette{display:flex;align-items:center;gap:9px;}
+.palette .lbl{color:#8b93a1;font-size:11.5px;letter-spacing:.3px;margin-right:2px;}
+.swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,.25);
+  box-shadow:0 2px 4px rgba(0,0,0,.4);}
+.swatch.sel{border-color:#fff;transform:scale(1.12);}
+.swatch[data-c="blue"]{background:#3a5fa6;} .swatch[data-c="green"]{background:#5c8a3f;}
+.swatch[data-c="red"]{background:#b04545;}   .swatch[data-c="grey"]{background:#71757b;}
+.swatch[data-c="yellow"]{background:#d9c24a;}
+.hints{color:#8b93a1;font-size:11.5px;line-height:1.8;text-align:center;letter-spacing:.2px;max-width:520px;}
+.hints b{color:#c3cad4;font-weight:600;}
+kbd{background:#2a2f38;border:1px solid #3c434f;border-bottom-width:2px;border-radius:4px;padding:0 5px;font-size:10.5px;color:#cfd6e0;font-family:inherit;}
+
+/* ============ PHONE BODY — rounded-rect, domed top, subtle waist ============ */
+#phone{
+  position:relative;width:288px;height:678px;transform-style:preserve-3d;
+  /* outline from spec: full semicircular-ish top (r~20mm), bottom corners r~12mm,
+     sides nearly parallel with a very slight waist (~46 wide) at Y~60-90mm. */
+  clip-path:polygon(
+    58.33% 0.00%, 63.77% 0.15%, 69.12% 0.60%, 74.28% 1.35%, 79.17% 2.37%,
+    83.70% 3.66%, 87.80% 5.18%, 91.39% 6.92%, 94.42% 8.85%, 96.83% 10.93%,
+    98.58% 13.12%, 99.64% 15.39%, 100.00% 17.70%, 100.00% 25.77%, 99.99% 33.85%,
+    99.75% 41.92%, 99.21% 50.00%, 98.38% 58.08%, 97.26% 66.15%, 98.33% 74.23%,
+    99.18% 82.30%, 100.00% 89.38%, 99.79% 90.77%, 99.15% 92.13%, 98.10% 93.44%,
+    96.65% 94.69%, 94.83% 95.85%, 92.68% 96.89%, 90.22% 97.81%, 87.50% 98.58%,
+    84.57% 99.19%, 81.47% 99.64%, 78.26% 99.91%, 75.00% 100.00%, 68.75% 100.00%,
+    62.50% 100.00%, 56.25% 100.00%, 50.00% 100.00%, 43.75% 100.00%, 37.50% 100.00%,
+    31.25% 100.00%, 25.00% 100.00%, 21.74% 99.91%, 18.53% 99.64%, 15.43% 99.19%,
+    12.50% 98.58%, 9.78% 97.81%, 7.32% 96.89%, 5.17% 95.85%, 3.35% 94.69%,
+    1.90% 93.44%, 0.85% 92.13%, 0.21% 90.77%, 0.00% 89.38%, 0.33% 89.38%,
+    0.91% 81.31%, 1.80% 73.23%, 2.59% 65.15%, 1.50% 57.08%, 0.71% 49.00%,
+    0.21% 40.93%, 0.00% 32.85%, 0.00% 17.70%, 0.36% 15.39%, 1.42% 13.12%,
+    3.17% 10.93%, 5.58% 8.85%, 8.61% 6.92%, 12.20% 5.18%, 16.30% 3.66%,
+    20.83% 2.37%, 25.72% 1.35%, 30.88% 0.60%, 36.23% 0.15%, 41.67% 0.00%
+  );
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.06) 6%, rgba(255,255,255,0) 14%,
+      rgba(0,0,0,0) 86%, rgba(0,0,0,.10) 94%, rgba(0,0,0,.28) 100%),
+    linear-gradient(179deg, var(--b1) 0%, var(--b2) 46%, var(--b3) 100%);
+}
+/* glossy sheen streak down the left third (the 3310 plastic is glossy) */
+#phone::before{
+  content:"";position:absolute;top:3%;bottom:3%;left:10%;width:15%;
+  background:linear-gradient(90deg, rgba(255,255,255,.24), rgba(255,255,255,0));
+  border-radius:40px;pointer-events:none;filter:blur(3px);opacity:.65;
+}
+
+/* ============ EARPIECE — faint oval + 4 short horizontal slots (spec 2a) ============ */
+.earpiece-area{
+  position:absolute;left:114px;top:24px;width:60px;height:36px;border-radius:50%;
+  background:radial-gradient(60% 60% at 50% 45%, rgba(0,0,0,.28), rgba(0,0,0,.10) 70%, transparent);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.45);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+}
+.earpiece-area i{width:36px;height:4px;border-radius:2px;background:#0c0e12;display:block;
+  box-shadow:inset 0 1px 1px #000, 0 1px 0 rgba(255,255,255,.22);}
+
+/* ============ NOKIA WORDMARK (spec 2b) — raised/printed caps, ~14x3mm ============ */
+.brand{
+  position:absolute;left:0;right:0;top:68px;text-align:center;
+  font-size:15px;font-weight:700;letter-spacing:5px;text-indent:5px;
+  color:#e7ecf2;text-shadow:0 1px 1px rgba(0,0,0,.55), 0 -1px 0 rgba(255,255,255,.28);
+}
+
+/* ============ DISPLAY WINDOW — black surround, lens, LCD (spec 2c) ============ */
+.screen{
+  position:absolute;left:36px;top:96px;width:216px;height:192px;
+  /* rounded-rect, corner radius ~4mm; bottom edge arches DOWN ~2mm at center */
+  clip-path:polygon(
+    0.00% 12.50%, 0.04% 11.41%, 0.17% 10.33%, 0.38% 9.26%, 0.67% 8.22%,
+    1.04% 7.22%, 1.49% 6.25%, 2.01% 5.33%, 2.60% 4.47%, 3.25% 3.66%,
+    3.97% 2.92%, 4.74% 2.26%, 5.56% 1.67%, 6.42% 1.17%, 7.31% 0.75%,
+    8.24% 0.43%, 9.18% 0.19%, 10.14% 0.05%, 11.11% 0.00%, 18.18% 0.00%,
+    25.25% 0.00%, 32.32% 0.00%, 39.39% 0.00%, 46.46% 0.00%, 53.54% 0.00%,
+    60.61% 0.00%, 67.68% 0.00%, 74.75% 0.00%, 81.82% 0.00%, 88.89% 0.00%,
+    89.86% 0.05%, 90.82% 0.19%, 91.76% 0.43%, 92.69% 0.75%, 93.58% 1.17%,
+    94.44% 1.67%, 95.26% 2.26%, 96.03% 2.92%, 96.75% 3.66%, 97.40% 4.47%,
+    97.99% 5.33%, 98.51% 6.25%, 98.96% 7.22%, 99.33% 8.22%, 99.62% 9.26%,
+    99.83% 10.33%, 99.96% 11.41%, 100.00% 12.50%, 100.00% 23.96%, 100.00% 35.42%,
+    100.00% 46.88%, 100.00% 58.33%, 100.00% 69.79%, 100.00% 81.25%, 99.96% 82.34%,
+    99.83% 83.42%, 99.62% 84.49%, 99.33% 85.53%, 98.96% 86.53%, 98.51% 87.50%,
+    97.99% 88.42%, 97.40% 89.28%, 96.75% 90.09%, 96.03% 90.83%, 95.26% 91.49%,
+    94.44% 92.08%, 93.58% 92.58%, 92.69% 93.00%, 91.76% 93.32%, 90.82% 93.56%,
+    89.86% 93.70%, 88.89% 93.75%, 88.89% 96.22%, 84.57% 97.01%, 80.25% 97.71%,
+    75.93% 98.32%, 71.60% 98.83%, 67.28% 99.25%, 62.96% 99.58%, 58.64% 99.81%,
+    54.32% 99.95%, 50.00% 100.00%, 45.68% 99.95%, 41.36% 99.81%, 37.04% 99.58%,
+    32.72% 99.25%, 28.40% 98.83%, 24.07% 98.32%, 19.75% 97.71%, 15.43% 97.01%,
+    11.11% 96.22%, 11.11% 93.75%, 10.14% 93.70%, 9.18% 93.56%, 8.24% 93.32%,
+    7.31% 93.00%, 6.42% 92.58%, 5.56% 92.08%, 4.74% 91.49%, 3.97% 90.83%,
+    3.25% 90.09%, 2.60% 89.28%, 2.01% 88.42%, 1.49% 87.50%, 1.04% 86.53%,
+    0.67% 85.53%, 0.38% 84.49%, 0.17% 83.42%, 0.04% 82.34%, 0.00% 81.25%,
+    0.00% 69.79%, 0.00% 58.33%, 0.00% 46.88%, 0.00% 35.42%, 0.00% 23.96%,
+    0.00% 12.50%
+  );
+  background:linear-gradient(180deg,#0c0e0c 0%,#050705 100%);
+  box-shadow:inset 0 2px 9px rgba(0,0,0,.95), inset 0 0 3px #000;
+}
+/* active LCD — ~30x18mm (180x108) centered; native grid 84x48 px */
+#lcd{
+  position:absolute;left:18px;top:42px;width:180px;height:108px;
+  image-rendering:pixelated;image-rendering:crisp-edges;
+  background:var(--lcd-bg);border-radius:3px;
+}
+/* flush transparent lens reflection */
+.glass{
+  position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(118deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,.05) 20%, rgba(255,255,255,0) 46%);
+}
+
+/* ============ SILVER RUBBER KEYMAT — all keys share one mat (spec 2d/2e/2f) ============ */
+.keymat{
+  position:absolute;left:28px;top:294px;width:232px;height:322px;border-radius:24px;
+  background:
+    linear-gradient(105deg, rgba(255,255,255,.5) 0%, rgba(255,255,255,.10) 22%, rgba(255,255,255,0) 46%,
+      rgba(0,0,0,.10) 78%, rgba(0,0,0,.22) 100%),
+    linear-gradient(180deg,#eef1f4 0%,#d3d9df 40%,#b7bec6 74%,#cdd3da 100%);
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,.8), inset 0 -5px 9px rgba(0,0,0,.28),
+    inset 4px 0 7px rgba(255,255,255,.30), inset -4px 0 7px rgba(255,255,255,.16),
+    0 2px 5px rgba(0,0,0,.4);
+}
+
+/* ============ NAVI KEY — main select, wide lens/crescent (spec 2d) ============ */
+.navi{
+  position:absolute;left:72px;top:302px;width:144px;height:48px;border:none;cursor:pointer;
+  /* top edge convex, bottom edge concave -> crescent "smile" lens */
+  clip-path:polygon(
+    4.17% 36.68%, 7.99% 31.93%, 11.81% 28.49%, 15.62% 25.79%, 19.44% 23.62%,
+    23.26% 21.83%, 27.08% 20.37%, 30.90% 19.19%, 34.72% 18.26%, 38.54% 17.55%,
+    42.36% 17.06%, 46.18% 16.76%, 50.00% 16.67%, 53.82% 16.76%, 57.64% 17.06%,
+    61.46% 17.55%, 65.28% 18.26%, 69.10% 19.19%, 72.92% 20.37%, 76.74% 21.83%,
+    80.56% 23.62%, 84.38% 25.79%, 88.19% 28.49%, 92.01% 31.93%, 95.83% 36.68%,
+    95.83% 60.82%, 92.01% 64.68%, 88.19% 67.48%, 84.38% 69.67%, 80.56% 71.44%,
+    76.74% 72.89%, 72.92% 74.07%, 69.10% 75.03%, 65.28% 75.79%, 61.46% 76.36%,
+    57.64% 76.77%, 53.82% 77.00%, 50.00% 77.08%, 46.18% 77.00%, 42.36% 76.77%,
+    38.54% 76.36%, 34.72% 75.79%, 30.90% 75.03%, 27.08% 74.07%, 23.26% 72.89%,
+    19.44% 71.44%, 15.62% 69.67%, 11.81% 67.48%, 7.99% 64.68%, 4.17% 60.82%
+  );
+  background:linear-gradient(180deg,#eef3f8 0%,#c2ccd8 52%,#8b99ac 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75), inset 0 -3px 4px rgba(0,0,0,.30), 0 3px 5px rgba(0,0,0,.45);
+}
+.navi:active{box-shadow:inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 3px rgba(0,0,0,.32), 0 1px 2px rgba(0,0,0,.4);}
+.navi .accent{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:30px;height:4px;border-radius:2px;background:#3f6fb0;opacity:.85;
+  box-shadow:0 1px 1px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);}
+
+/* ============ SECOND CONTROL ROW — C key (left) + scroll rocker (right) (spec 2e) ============ */
+.ctrl-row{position:absolute;left:36px;top:366px;width:216px;height:42px;
+  display:flex;align-items:center;justify-content:space-between;}
+.fkey{border:none;cursor:pointer;position:relative;color:var(--legend);
+  background:linear-gradient(180deg, var(--key-hi) 0%, var(--key-mid) 52%, var(--key-lo) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7), inset 0 -3px 4px rgba(0,0,0,.28), 0 3px 5px rgba(0,0,0,.45);}
+.fkey:active{transform:translateY(1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.4);}
+/* rounded trapezoid ~11x7mm (66x42), tilted ~10deg with the OUTER end higher */
+.fkey.left {width:58px;height:42px;border-radius:38% 46% 46% 38%/58% 58% 58% 58%;transform:rotate(7deg);}
+/* up/down scroll rocker (MIN-34): one LONGER pill key — up arrow on top, down arrow at the bottom */
+.fkey.right{width:50px;height:62px;border-radius:25px;transform:rotate(-4deg);}
+.fkey .mk{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;line-height:1;}
+.fkey .mk svg{width:22px;height:22px;display:block;}
+/* vertical arrow stack for the long rocker: arrows pinned to opposite ends */
+.fkey .mk-v{flex-direction:column;justify-content:space-between;padding:9px 0;}
+.fkey .mk-v svg{width:26px;height:14px;}
+.fkey .lbl{font-size:15px;font-weight:700;line-height:1;}
+
+/* ============ NUMBER KEYPAD — 4 rows x 3 cols on the keymat (spec 2f) ============ */
+.keypad{position:absolute;left:36px;top:426px;width:216px;display:flex;flex-direction:column;gap:9px;}
+.krow{display:flex;justify-content:center;gap:9px;height:39px;align-items:center;}
+.pkey{
+  width:66px;height:39px;border:none;cursor:pointer;position:relative;
+  border-radius:50%/56%;
+  background:linear-gradient(180deg, var(--key-hi) 0%, var(--key-mid) 52%, var(--key-lo) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7), inset 0 -3px 4px rgba(0,0,0,.26), 0 3px 4px rgba(0,0,0,.42);
+  display:flex;align-items:center;justify-content:center;gap:5px;color:var(--legend);}
+/* slight "smile" arc per row: outer keys ~1mm higher than the centre key */
+.krow .pkey:first-child{transform:translateY(-2.5px);}
+.krow .pkey:last-child {transform:translateY(-2.5px);}
+.pkey:active{transform:translateY(1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.4);}
+.pkey .num{font-size:18px;font-weight:600;line-height:1;}
+.pkey .ltr{font-size:8.5px;font-weight:700;letter-spacing:1px;line-height:1;margin-top:2px;color:var(--legend-dim);}
+.pkey.sym .num{font-size:21px;font-weight:400;}
+.pkey .vm{display:block;margin-bottom:1px;}
+
+/* ============ MICROPHONE — tiny hole below the 0 key (spec 2g) ============ */
+.mic{position:absolute;left:141px;top:630px;width:6px;height:6px;border-radius:50%;
+  background:#0a0b0c;box-shadow:inset 0 1px 2px #000, 0 1px 0 rgba(255,255,255,.18);}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="demo-title">Nokia 3310 (2000) — 360° feature tour
+    <small>The whole phone spins while it walks its own menus — front, sides, back and bottom.</small>
+  </div>
+
+  <div class="scene">
+    <div class="tilt">
+      <div class="spin" id="spinner">
+        <div class="phone3d" data-theme="blue">
+
+          <!-- FRONT FACE: the full existing replica -->
+          <div id="phone" data-theme="blue">
+            <div class="earpiece-area"><i></i><i></i><i></i><i></i></div>
+            <div class="brand">NOKIA</div>
+            <div class="screen">
+              <canvas id="lcd" width="84" height="48"></canvas>
+              <div class="glass"></div>
+            </div>
+            <div class="keymat"></div>
+            <button class="navi" data-key="select" title="Select / Navi key">
+              <span class="accent"></span>
+            </button>
+            <div class="ctrl-row">
+              <button class="fkey left" data-key="softL" title="Clear / back (C)">
+                <span class="mk"><span class="lbl">C</span></span>
+              </button>
+              <button class="fkey right" data-key="softR" title="Scroll up/down · hold = power off">
+                <span class="mk mk-v">
+                  <svg viewBox="0 0 26 14" fill="#25282d" aria-hidden="true"><path d="M13 1 L24 13 L2 13 Z"/></svg>
+                  <svg viewBox="0 0 26 14" fill="#25282d" aria-hidden="true"><path d="M13 13 L2 1 L24 1 Z"/></svg>
+                </span>
+              </button>
+            </div>
+            <div class="keypad">
+              <div class="krow">
+                <button class="pkey" data-key="1"><span class="vm"><svg width="12" height="8" viewBox="0 0 12 8" fill="#25282d" aria-hidden="true"><circle cx="3.4" cy="4" r="2.6"/><circle cx="8.6" cy="4" r="2.6"/></svg></span><span class="num">1</span></button>
+                <button class="pkey" data-key="2"><span class="num">2</span><span class="ltr">abc</span></button>
+                <button class="pkey" data-key="3"><span class="num">3</span><span class="ltr">def</span></button>
+              </div>
+              <div class="krow">
+                <button class="pkey" data-key="4"><span class="num">4</span><span class="ltr">ghi</span></button>
+                <button class="pkey" data-key="5"><span class="num">5</span><span class="ltr">jkl</span></button>
+                <button class="pkey" data-key="6"><span class="num">6</span><span class="ltr">mno</span></button>
+              </div>
+              <div class="krow">
+                <button class="pkey" data-key="7"><span class="num">7</span><span class="ltr">pqrs</span></button>
+                <button class="pkey" data-key="8"><span class="num">8</span><span class="ltr">tuv</span></button>
+                <button class="pkey" data-key="9"><span class="num">9</span><span class="ltr">wxyz</span></button>
+              </div>
+              <div class="krow">
+                <button class="pkey sym" data-key="*"><span class="num">*</span><span class="ltr">+</span></button>
+                <button class="pkey" data-key="0"><span class="num">0</span><span class="ltr">&#9251;</span></button>
+                <button class="pkey sym" data-key="#"><span class="num">#</span><span class="ltr">&#8962;</span></button>
+              </div>
+            </div>
+            <div class="mic" title="Microphone"></div>
+          </div>
+
+          <!-- BACK FACE: NOKIA logo + sealed battery cover with release tab -->
+          <div class="face back">
+            <div class="b-sheen"></div>
+            <div class="b-logo">NOKIA</div>
+            <div class="b-model">3310</div>
+            <div class="b-cover"></div>
+            <div class="b-tab"></div>
+          </div>
+
+          <!-- SIDE FACES -->
+          <div class="face sideL"><div class="grille"><i></i><i></i><i></i></div></div>
+          <div class="face sideR"></div>
+
+          <!-- TOP / BOTTOM CAPS -->
+          <div class="face topF"><div class="oval"></div></div>
+          <div class="face botF">
+            <div class="ports">
+              <div class="p-jack" title="2.5mm jack"></div>
+              <div class="p-charge" title="Charger socket"></div>
+              <div class="p-mic" title="Mic hole"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="shadow3d"></div>
+  </div>
+
+  <div id="caption">
+    <span class="step" id="caption-step">DEMO</span>
+    <span id="caption-text">Warming up…</span>
+  </div>
+
+  <div class="palette" id="palette">
+    <span class="lbl">Colour</span>
+    <button class="swatch sel" data-c="blue"   title="Blue"></button>
+    <button class="swatch"     data-c="green"  title="Green"></button>
+    <button class="swatch"     data-c="red"    title="Red"></button>
+    <button class="swatch"     data-c="grey"   title="Grey"></button>
+    <button class="swatch"     data-c="yellow" title="Yellow"></button>
+  </div>
+
+  <div class="hints">
+    The centre <b>Navi</b> key is the only general-purpose button — its function is the single word shown at the
+    <b>bottom-centre</b> of the screen (e.g. "Menu", "Open", "Call").<br>
+    The <b>C</b> key and the <b>scroll rocker</b> are fixed-function: C implicitly clears / backs out, the rocker scrolls — neither ever gets an on-screen label.<br>
+    The demo drives itself — touch any key or press a key to take over (it pauses for a moment).<br>
+    <kbd>&uarr;</kbd><kbd>&darr;</kbd> scroll · <kbd>Enter</kbd>/<kbd>Space</kbd> select · <kbd>A</kbd> C / clear · <kbd>L</kbd> rocker (scroll) ·
+    hold <b>rocker</b> / <kbd>R</kbd> to power off · <kbd>0–9</kbd> <kbd>*</kbd> <kbd>#</kbd> keypad
+  </div>
+</div>
+
+<script src="js/lcd.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/state.js"></script>
+<script src="js/screens.js"></script>
+<script src="js/games.js"></script>
+<script src="js/main.js"></script>
+<script src="js/demo-tour.js"></script>
+</body>
+</html>
