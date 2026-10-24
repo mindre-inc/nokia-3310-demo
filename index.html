@@ -48,8 +48,9 @@ body{
 /* ============ 3D SCENE ============ */
 .scene{position:relative;width:288px;height:678px;transform-style:preserve-3d;margin:6px 0;}
 .tilt{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(11deg);}
-.spin{position:absolute;inset:0;transform-style:preserve-3d;animation:spin360 16s linear infinite;}
-@keyframes spin360{from{transform:rotateY(0deg);}to{transform:rotateY(360deg);}}
+/* MIN-45: rotation is driven by js/rotation.js (rAF) so it can pause in
+   place, ease to front-facing on Stop, and resume without snapping. */
+.spin{position:absolute;inset:0;transform-style:preserve-3d;}
 .phone3d{position:absolute;inset:0;transform-style:preserve-3d;}
 
 .face{position:absolute;top:0;left:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
@@ -149,6 +150,16 @@ body{
   box-shadow:0 4px 14px rgba(0,0,0,.35);max-width:640px;}
 #caption .step{font-size:10.5px;font-weight:700;letter-spacing:1px;color:#8fa3c8;white-space:nowrap;}
 #caption-text{color:#e3e9f2;font-size:13.5px;letter-spacing:.2px;transition:opacity .18s ease;text-align:center;}
+
+/* MIN-45: demo controls — Stop/Start rotation, Restart tour */
+.controls{display:flex;align-items:center;gap:10px;}
+.controls button{
+  font:inherit;font-size:13px;font-weight:600;letter-spacing:.2px;color:#dfe5ee;
+  background:rgba(24,29,38,.72);border:1px solid rgba(255,255,255,.14);border-radius:10px;
+  padding:9px 16px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.35);
+  transition:background .15s ease,border-color .15s ease;}
+.controls button:hover{background:rgba(40,48,62,.85);border-color:rgba(255,255,255,.28);}
+.controls button:active{transform:translateY(1px);}
 
 /* ---- colour picker + hints (kept from the app) ---- */
 .palette{display:flex;align-items:center;gap:9px;}
@@ -425,6 +436,11 @@ kbd{background:#2a2f38;border:1px solid #3c434f;border-bottom-width:2px;border-r
     <div class="shadow3d"></div>
   </div>
 
+  <div class="controls">
+    <button id="btn-spin" type="button" title="Stop or start the 360° rotation (or press S)">⏸ Stop rotation</button>
+    <button id="btn-tour" type="button" title="Restart the auto-demo tour from step 1">↻ Restart tour</button>
+  </div>
+
   <div id="caption">
     <span class="step" id="caption-step">DEMO</span>
     <span id="caption-text">Warming up…</span>
@@ -443,9 +459,9 @@ kbd{background:#2a2f38;border:1px solid #3c434f;border-bottom-width:2px;border-r
     The centre <b>Navi</b> key is the only general-purpose button — its function is the single word shown at the
     <b>bottom-centre</b> of the screen (e.g. "Menu", "Open", "Call").<br>
     The <b>C</b> key and the <b>scroll rocker</b> are fixed-function: C implicitly clears / backs out, the rocker scrolls — neither ever gets an on-screen label.<br>
-    The demo drives itself — touch any key or press a key to take over (it pauses for a moment).<br>
+    The demo drives itself — touch any key or press a mapped key and the tour AND rotation stop for good: you're driving.<br>
     <kbd>&uarr;</kbd><kbd>&darr;</kbd> scroll · <kbd>Enter</kbd>/<kbd>Space</kbd> select · <kbd>A</kbd> C / clear · <kbd>L</kbd> rocker (scroll) ·
-    hold <b>rocker</b> / <kbd>R</kbd> to power off · <kbd>0–9</kbd> <kbd>*</kbd> <kbd>#</kbd> keypad
+    hold <b>rocker</b> / <kbd>R</kbd> to power off · <kbd>0–9</kbd> <kbd>*</kbd> <kbd>#</kbd> keypad · <kbd>S</kbd> stop/start spin
   </div>
 </div>
 
@@ -455,6 +471,7 @@ kbd{background:#2a2f38;border:1px solid #3c434f;border-bottom-width:2px;border-r
 <script src="js/screens.js"></script>
 <script src="js/games.js"></script>
 <script src="js/main.js"></script>
+<script src="js/rotation.js"></script>
 <script src="js/demo-tour.js"></script>
 </body>
 </html>
